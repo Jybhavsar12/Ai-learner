@@ -310,11 +310,47 @@
             <div class="training-log" id="trainingLog"></div>
         </div>
 
-        <div class="grid">
+        <div class="card">
+            <h2>Greeting Classifier (Neural Network)</h2>
+            <p style="color: #555; font-size: 0.8rem; margin-bottom: 15px;">
+                A neural network trained to classify greetings into categories: greeting, farewell, gratitude, question
+            </p>
+            <div class="stats" style="grid-template-columns: repeat(4, 1fr);">
+                <div class="stat"><div class="stat-value" id="greetingEpochVal">0</div><div class="stat-label">Epoch</div></div>
+                <div class="stat"><div class="stat-value" id="greetingLossVal">0.00</div><div class="stat-label">Loss</div></div>
+                <div class="stat"><div class="stat-value" id="greetingAccVal">0%</div><div class="stat-label">Accuracy</div></div>
+                <div class="stat"><div class="stat-value" id="greetingParamsVal">196</div><div class="stat-label">Parameters</div></div>
+            </div>
+            <div class="controls">
+                <button type="button" onclick="startGreetingTraining()">Train Network</button>
+                <button type="button" onclick="resetGreetingNetwork()">Reset</button>
+            </div>
+            <div style="margin-top: 20px;">
+                <input type="text" class="question-input" id="greetingInput" placeholder="Type a greeting to classify (e.g., hello, bye, thanks)...">
+                <button type="button" onclick="testGreeting()">Classify</button>
+            </div>
+            <div id="greetingResult" style="margin-top: 15px; padding: 15px; background: #0f0f0f; border: 1px solid #222; display: none;">
+                <div style="color: #888; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;">Result</div>
+                <div id="greetingCategory" style="font-size: 1.2rem; color: #fff; margin: 10px 0;"></div>
+                <div id="greetingConfidence" style="color: #555;"></div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: 20px;">
+            <h2>AI Chat Demo</h2>
+            <p style="color: #555; font-size: 0.8rem; margin-bottom: 15px;">
+                Chat with the trained AI. It uses the greeting classifier to generate responses.
+            </p>
+            <div id="chatLog" style="max-height: 200px; overflow-y: auto; margin-bottom: 15px; padding: 10px; background: #0a0a0a; border: 1px solid #1a1a1a;"></div>
+            <input type="text" class="question-input" id="chatInput" placeholder="Say something to the AI...">
+            <button type="button" onclick="sendChat()">Send</button>
+        </div>
+
+        <div class="grid" style="margin-top: 20px;">
             <div class="card">
                 <h2>Ask a Question</h2>
                 <input type="text" class="question-input" id="questionInput" placeholder="Type your question about AI training...">
-                <button onclick="logQuestion()">Log Question</button>
+                <button type="button" onclick="logQuestion()">Log Question</button>
             </div>
             <div class="card">
                 <h2>Question Log</h2>
