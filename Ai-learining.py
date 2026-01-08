@@ -1,4 +1,9 @@
 import numpy as np
+import webbrowser
+import os
+import http.server
+import socketserver
+import threading
 
 print("=" * 60)
 print("           AI TRAINING EXAMPLES")
@@ -263,4 +268,58 @@ Key Concepts Demonstrated:
   - Activation functions (ReLU, Softmax)
   - Multi-layer neural networks
 """)
+
+# ============================================================
+# LAUNCH WEB VISUALIZER
+# ============================================================
+def launch_web_visualizer():
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+
+    # Change to script directory for serving files
+    os.chdir(script_dir)
+
+    PORT = 8080
+
+    # Create a simple HTTP server
+    handler = http.server.SimpleHTTPRequestHandler
+
+    # Suppress server logs
+    handler.log_message = lambda *args: None
+
+    try:
+        with socketserver.TCPServer(("", PORT), handler) as httpd:
+            url = f"http://localhost:{PORT}/index.html"
+            print("=" * 60)
+            print("🌐 WEB VISUALIZER")
+            print("=" * 60)
+            print(f"\n  Server running at: http://localhost:{PORT}")
+            print(f"  Opening browser...")
+            print(f"\n  Press Ctrl+C to stop the server\n")
+            print("=" * 60)
+
+            # Open browser
+            webbrowser.open(url)
+
+            # Keep server running
+            httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\n\n👋 Server stopped. Goodbye!")
+    except OSError as e:
+        if e.errno == 48:  # Port already in use
+            print(f"\n⚠️  Port {PORT} is already in use.")
+            print(f"  Opening browser anyway...")
+            webbrowser.open(f"http://localhost:{PORT}/index.html")
+        else:
+            raise
+
+if __name__ == "__main__":
+    print("\n" + "=" * 60)
+    print("Would you like to launch the web visualizer? (y/n): ", end="")
+    choice = input().strip().lower()
+
+    if choice in ['y', 'yes', '']:
+        launch_web_visualizer()
+    else:
+        print("\n👋 Goodbye! Run 'python3 Ai-learining.py' again to launch the web visualizer.")
 
