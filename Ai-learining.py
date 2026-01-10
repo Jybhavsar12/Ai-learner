@@ -469,7 +469,7 @@ def launch_web_visualizer():
             # Keep server running
             httpd.serve_forever()
     except KeyboardInterrupt:
-        print("\n\n👋 Server stopped. Goodbye!")
+        print("\n\n Server stopped. Goodbye!")
     except OSError as e:
         if e.errno == 48:  # Port already in use
             print(f"\n⚠️  Port {PORT} is already in use.")
@@ -486,5 +486,5 @@ if __name__ == "__main__":
     if choice in ['y', 'yes', '']:
         launch_web_visualizer()
     else:
-        print("\n👋 Goodbye! Run 'python3 Ai-learining.py' again to launch the web visualizer.")
+        print("\n Goodbye! Run 'python3 Ai-learining.py' again to launch the web visualizer.")
 
