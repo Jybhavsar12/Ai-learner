@@ -44,26 +44,98 @@ print("\n" + "=" * 60)
 print("[EXAMPLE 2] Greeting Classifier: Neural Network")
 print("-" * 60)
 
-# Training data: Greetings and their categories
+# Training data: Expanded with more categories and phrases
 greetings_data = {
+    # Greetings
     "hello": "greeting",
     "hi": "greeting",
     "hey": "greeting",
     "good morning": "greeting",
     "good evening": "greeting",
+    "good afternoon": "greeting",
+    "greetings": "greeting",
+    "howdy": "greeting",
+    "hi there": "greeting",
+    "hello there": "greeting",
+    "hey there": "greeting",
+    "welcome": "greeting",
+
+    # Farewells
     "bye": "farewell",
     "goodbye": "farewell",
     "see you": "farewell",
     "later": "farewell",
+    "see you later": "farewell",
+    "take care": "farewell",
+    "good night": "farewell",
+    "farewell": "farewell",
+    "bye bye": "farewell",
+    "catch you later": "farewell",
+    "until next time": "farewell",
+
+    # Gratitude
     "thanks": "gratitude",
     "thank you": "gratitude",
     "appreciate": "gratitude",
+    "thank you so much": "gratitude",
+    "thanks a lot": "gratitude",
+    "many thanks": "gratitude",
+    "grateful": "gratitude",
+    "much appreciated": "gratitude",
+    "thanks for help": "gratitude",
+
+    # Questions
     "how are you": "question",
     "whats up": "question",
     "how do you do": "question",
+    "how is it going": "question",
+    "what is new": "question",
+    "how have you been": "question",
+    "are you okay": "question",
+    "you good": "question",
+
+    # Apologies
+    "sorry": "apology",
+    "i am sorry": "apology",
+    "my apologies": "apology",
+    "excuse me": "apology",
+    "pardon me": "apology",
+    "forgive me": "apology",
+    "my bad": "apology",
+    "apologize": "apology",
+
+    # Requests
+    "please help": "request",
+    "can you help": "request",
+    "i need help": "request",
+    "help me": "request",
+    "could you": "request",
+    "would you": "request",
+    "can you": "request",
+    "please": "request",
+
+    # Affirmations
+    "yes": "affirmation",
+    "yeah": "affirmation",
+    "yep": "affirmation",
+    "sure": "affirmation",
+    "okay": "affirmation",
+    "alright": "affirmation",
+    "absolutely": "affirmation",
+    "definitely": "affirmation",
+    "of course": "affirmation",
+
+    # Negations
+    "no": "negation",
+    "nope": "negation",
+    "not really": "negation",
+    "never": "negation",
+    "no way": "negation",
+    "i dont think so": "negation",
+    "negative": "negation",
 }
 
-categories = ["greeting", "farewell", "gratitude", "question"]
+categories = ["greeting", "farewell", "gratitude", "question", "apology", "request", "affirmation", "negation"]
 cat_to_idx = {cat: i for i, cat in enumerate(categories)}
 idx_to_cat = {i: cat for i, cat in enumerate(categories)}
 
@@ -97,23 +169,39 @@ Y_onehot = np.zeros((len(Y_train), len(categories)))
 for i, y in enumerate(Y_train):
     Y_onehot[i, y] = 1
 
-# Neural Network Parameters
+# Deep Neural Network Parameters (3 hidden layers!)
 np.random.seed(42)
-hidden_size = 8
+hidden1_size = 32   # First hidden layer
+hidden2_size = 16   # Second hidden layer
+hidden3_size = 8    # Third hidden layer
 output_size = len(categories)
 
-# Initialize weights (MORE PARAMETERS!)
-W1 = np.random.randn(vocab_size, hidden_size) * 0.5
-b1 = np.zeros((1, hidden_size))
-W2 = np.random.randn(hidden_size, output_size) * 0.5
-b2 = np.zeros((1, output_size))
+# Initialize weights for deep network
+W1 = np.random.randn(vocab_size, hidden1_size) * 0.3
+b1 = np.zeros((1, hidden1_size))
+W2 = np.random.randn(hidden1_size, hidden2_size) * 0.3
+b2 = np.zeros((1, hidden2_size))
+W3 = np.random.randn(hidden2_size, hidden3_size) * 0.3
+b3 = np.zeros((1, hidden3_size))
+W4 = np.random.randn(hidden3_size, output_size) * 0.3
+b4 = np.zeros((1, output_size))
 
-total_params = (vocab_size * hidden_size) + hidden_size + (hidden_size * output_size) + output_size
+# Calculate total parameters
+params_w1 = vocab_size * hidden1_size
+params_w2 = hidden1_size * hidden2_size
+params_w3 = hidden2_size * hidden3_size
+params_w4 = hidden3_size * output_size
+total_params = params_w1 + hidden1_size + params_w2 + hidden2_size + params_w3 + hidden3_size + params_w4 + output_size
+
 print(f"  Total parameters: {total_params}")
-print(f"    - W1: {vocab_size}x{hidden_size} = {vocab_size * hidden_size}")
-print(f"    - b1: {hidden_size}")
-print(f"    - W2: {hidden_size}x{output_size} = {hidden_size * output_size}")
-print(f"    - b2: {output_size}")
+print(f"    - W1: {vocab_size}x{hidden1_size} = {params_w1}")
+print(f"    - b1: {hidden1_size}")
+print(f"    - W2: {hidden1_size}x{hidden2_size} = {params_w2}")
+print(f"    - b2: {hidden2_size}")
+print(f"    - W3: {hidden2_size}x{hidden3_size} = {params_w3}")
+print(f"    - b3: {hidden3_size}")
+print(f"    - W4: {hidden3_size}x{output_size} = {params_w4}")
+print(f"    - b4: {output_size}")
 
 # Activation functions
 def relu(x):
@@ -126,39 +214,63 @@ def softmax(x):
     exp_x = np.exp(x - np.max(x, axis=1, keepdims=True))
     return exp_x / np.sum(exp_x, axis=1, keepdims=True)
 
-# Training
-learning_rate = 0.1
-print(f"\n  Training neural network...")
+# Training - More epochs for deeper network
+learning_rate = 0.15
+num_epochs = 5000
+print(f"\n  Training deep neural network for {num_epochs} epochs...")
 
-for epoch in range(2000):
-    # Forward pass
+for epoch in range(num_epochs):
+    # Forward pass through all 4 layers
     z1 = np.dot(X_train, W1) + b1
     a1 = relu(z1)
     z2 = np.dot(a1, W2) + b2
-    a2 = softmax(z2)
+    a2 = relu(z2)
+    z3 = np.dot(a2, W3) + b3
+    a3 = relu(z3)
+    z4 = np.dot(a3, W4) + b4
+    a4 = softmax(z4)
 
     # Calculate loss (cross-entropy)
-    loss = -np.mean(np.sum(Y_onehot * np.log(a2 + 1e-8), axis=1))
+    loss = -np.mean(np.sum(Y_onehot * np.log(a4 + 1e-8), axis=1))
 
-    # Backward pass
+    # Backward pass through all layers
     m = X_train.shape[0]
-    dz2 = a2 - Y_onehot
+
+    # Output layer gradients
+    dz4 = a4 - Y_onehot
+    dW4 = np.dot(a3.T, dz4) / m
+    db4 = np.sum(dz4, axis=0, keepdims=True) / m
+
+    # Hidden layer 3 gradients
+    da3 = np.dot(dz4, W4.T)
+    dz3 = da3 * relu_derivative(z3)
+    dW3 = np.dot(a2.T, dz3) / m
+    db3 = np.sum(dz3, axis=0, keepdims=True) / m
+
+    # Hidden layer 2 gradients
+    da2 = np.dot(dz3, W3.T)
+    dz2 = da2 * relu_derivative(z2)
     dW2 = np.dot(a1.T, dz2) / m
     db2 = np.sum(dz2, axis=0, keepdims=True) / m
 
+    # Hidden layer 1 gradients
     da1 = np.dot(dz2, W2.T)
     dz1 = da1 * relu_derivative(z1)
     dW1 = np.dot(X_train.T, dz1) / m
     db1 = np.sum(dz1, axis=0, keepdims=True) / m
 
-    # Update weights
+    # Update all weights
+    W4 -= learning_rate * dW4
+    b4 -= learning_rate * db4
+    W3 -= learning_rate * dW3
+    b3 -= learning_rate * db3
     W2 -= learning_rate * dW2
     b2 -= learning_rate * db2
     W1 -= learning_rate * dW1
     b1 -= learning_rate * db1
 
-    if epoch % 400 == 0:
-        predictions = np.argmax(a2, axis=1)
+    if epoch % 1000 == 0:
+        predictions = np.argmax(a4, axis=1)
         accuracy = np.mean(predictions == Y_train) * 100
         print(f"  Epoch {epoch}: Loss = {loss:.4f}, Accuracy = {accuracy:.1f}%")
 
@@ -166,27 +278,45 @@ for epoch in range(2000):
 z1 = np.dot(X_train, W1) + b1
 a1 = relu(z1)
 z2 = np.dot(a1, W2) + b2
-a2 = softmax(z2)
-predictions = np.argmax(a2, axis=1)
+a2 = relu(z2)
+z3 = np.dot(a2, W3) + b3
+a3 = relu(z3)
+z4 = np.dot(a3, W4) + b4
+a4 = softmax(z4)
+predictions = np.argmax(a4, axis=1)
 accuracy = np.mean(predictions == Y_train) * 100
 print(f"\n  Final Accuracy: {accuracy:.1f}%")
 
-# Test the greeting classifier
+# Test the greeting classifier (using deep network)
 def classify_greeting(text):
     vec = text_to_vector(text.lower())
+    # Forward pass through deep network
     z1 = np.dot(vec, W1) + b1
     a1 = relu(z1)
     z2 = np.dot(a1, W2) + b2
-    a2 = softmax(z2)
-    pred_idx = np.argmax(a2)
-    confidence = a2[0, pred_idx] * 100
+    a2 = relu(z2)
+    z3 = np.dot(a2, W3) + b3
+    a3 = relu(z3)
+    z4 = np.dot(a3, W4) + b4
+    a4 = softmax(z4)
+    pred_idx = np.argmax(a4)
+    confidence = a4[0, pred_idx] * 100
     return idx_to_cat[pred_idx], confidence
 
-print("\n  Testing on new inputs:")
-test_phrases = ["hello", "bye", "thanks", "how are you", "good morning", "see you"]
+print("\n  Testing on various inputs:")
+test_phrases = [
+    "hello", "hi there", "good morning",      # greetings
+    "bye", "see you later", "take care",      # farewells
+    "thanks", "thank you so much",            # gratitude
+    "how are you", "whats up",                # questions
+    "sorry", "my apologies",                  # apologies
+    "please help", "can you help",            # requests
+    "yes", "absolutely",                      # affirmations
+    "no", "never"                             # negations
+]
 for phrase in test_phrases:
     category, conf = classify_greeting(phrase)
-    print(f"    '{phrase}' -> {category} ({conf:.1f}% confidence)")
+    print(f"    '{phrase}' -> {category} ({conf:.1f}%)")
 
 
 # ============================================================
@@ -197,16 +327,47 @@ print("[EXAMPLE 3] Greeting Response Generator")
 print("-" * 60)
 
 response_data = {
+    # Greetings
     "hello": "Hi there! How can I help you?",
     "hi": "Hello! Nice to meet you.",
     "hey": "Hey! What's going on?",
     "good morning": "Good morning! Hope you have a great day.",
     "good evening": "Good evening! How was your day?",
+    "good afternoon": "Good afternoon! How can I assist you?",
+    "howdy": "Howdy partner! What brings you here?",
+
+    # Farewells
     "bye": "Goodbye! Take care.",
     "goodbye": "See you later! Have a nice day.",
+    "see you": "See you soon! Take care.",
+    "take care": "You too! Stay safe.",
+    "good night": "Good night! Sweet dreams.",
+
+    # Gratitude
     "thanks": "You're welcome!",
     "thank you": "My pleasure! Happy to help.",
+    "thank you so much": "Anytime! I'm glad I could help.",
+
+    # Questions
     "how are you": "I'm doing great, thanks for asking!",
+    "whats up": "Not much, just here to help! What about you?",
+    "how is it going": "It's going well! How can I assist?",
+
+    # Apologies
+    "sorry": "No worries at all!",
+    "my apologies": "That's perfectly fine, no need to apologize.",
+
+    # Requests
+    "please help": "Of course! What do you need help with?",
+    "help me": "I'm here to help! What's the problem?",
+
+    # Affirmations
+    "yes": "Great! Let's proceed then.",
+    "okay": "Alright! What's next?",
+
+    # Negations
+    "no": "No problem! Let me know if you change your mind.",
+    "never": "That's okay! Is there something else I can help with?",
 }
 
 print(f"  Learned {len(response_data)} response patterns")
@@ -224,6 +385,10 @@ def get_response(user_input):
         "farewell": "Goodbye! Have a wonderful day!",
         "gratitude": "You're welcome! Glad I could help.",
         "question": "I'm doing well! Thanks for asking.",
+        "apology": "No worries at all! It's perfectly fine.",
+        "request": "Of course! I'm here to help. What do you need?",
+        "affirmation": "Perfect! Let's move forward.",
+        "negation": "That's okay! Let me know if you need anything else.",
     }
 
     return default_responses.get(category, "I'm not sure how to respond to that.")
